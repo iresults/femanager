@@ -12,6 +12,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\QueryInterface;
 use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
 use TYPO3\CMS\Extbase\Persistence\Repository;
+use function method_exists;
 
 /**
  * Class UserRepository
@@ -41,8 +42,8 @@ class UserRepository extends Repository
      * Find users by commaseparated usergroup list
      *
      * @param string $userGroupList commaseparated list of usergroup uids
-     * @param array $settings Flexform and TypoScript Settings
-     * @param array $filter Filter Array
+     * @param array  $settings      Flexform and TypoScript Settings
+     * @param array  $filter        Filter Array
      * @return QueryResultInterface|array
      */
     public function findByUsergroups($userGroupList, $settings, $filter)
@@ -51,7 +52,7 @@ class UserRepository extends Repository
 
         // where
         $and = [
-            $query->greaterThan('uid', 0)
+            $query->greaterThan('uid', 0),
         ];
         if (!empty($userGroupList)) {
             $selectedUsergroups = GeneralUtility::trimExplode(',', $userGroupList, true);
@@ -99,8 +100,8 @@ class UserRepository extends Repository
     /**
      * Check if there is already an entry in the table
      *
-     * @param $field
-     * @param $value
+     * @param      $field
+     * @param      $value
      * @param User $user Existing User
      * @return User|null
      */
@@ -110,7 +111,7 @@ class UserRepository extends Repository
         $this->ignoreEnableFieldsAndStoragePageAndStarttime($query);
 
         $and = [$query->equals($field, $value)];
-        if (method_exists($user, 'getUid')) {
+        if ($user && method_exists($user, 'getUid')) {
             $and[] = $query->logicalNot($query->equals('uid', $user->getUid()));
         }
         $constraint = $query->logicalAnd($and);
@@ -126,8 +127,8 @@ class UserRepository extends Repository
     /**
      * Check if there is already an entry in the table on current page
      *
-     * @param $field
-     * @param $value
+     * @param                                      $field
+     * @param                                      $value
      * @param \In2code\Femanager\Domain\Model\User $user Existing User
      * @return User|null
      */
@@ -138,9 +139,9 @@ class UserRepository extends Repository
 
         $and = [
             $query->equals($field, $value),
-            $query->equals('deleted', 0)
+            $query->equals('deleted', 0),
         ];
-        if (method_exists($user, 'getUid')) {
+        if ($user && method_exists($user, 'getUid')) {
             $and[] = $query->logicalNot($query->equals('uid', (int)$user->getUid()));
         }
         $constraint = $query->logicalAnd($and);
@@ -176,8 +177,8 @@ class UserRepository extends Repository
     /**
      * Find All for Backend Actions
      *
-     * @param array $filter Filter Array
-     * @param bool $userConfirmation Show only fe_users which are confirmed by the user?
+     * @param array $filter           Filter Array
+     * @param bool  $userConfirmation Show only fe_users which are confirmed by the user?
      * @return QueryResultInterface|array
      */
     public function findAllInBackendForConfirmation(array $filter, bool $userConfirmation = false)
@@ -201,7 +202,7 @@ class UserRepository extends Repository
      *      - Don't show any users for editors
      *      - Show all users for admins
      *
-     * @param array $and
+     * @param array          $and
      * @param QueryInterface $query
      * @return array
      */
@@ -219,9 +220,9 @@ class UserRepository extends Repository
     }
 
     /**
-     * @param array $filter
+     * @param array          $filter
      * @param QueryInterface $query
-     * @param array $and
+     * @param array          $and
      * @return array
      */
     protected function filterBySearchword(array $filter, QueryInterface $query, array $and): array
@@ -255,9 +256,9 @@ class UserRepository extends Repository
     }
 
     /**
-     * @param array $and
+     * @param array          $and
      * @param QueryInterface $query
-     * @param bool $userConfirmation
+     * @param bool           $userConfirmation
      * @return array
      */
     protected function filterByUserConfirmation(array $and, QueryInterface $query, bool $userConfirmation): array
@@ -312,7 +313,7 @@ class UserRepository extends Repository
         $this->ignoreEnableFieldsAndStoragePage($query);
         $and = [
             $query->equals('txFemanagerConfirmedbyuser', false),
-            $query->equals('email', $mail)
+            $query->equals('email', $mail),
         ];
         $query->matching($query->logicalAnd($and));
 

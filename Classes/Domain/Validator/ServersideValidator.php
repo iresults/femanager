@@ -274,7 +274,7 @@ class ServersideValidator extends AbstractValidator
      */
     protected function checkSameAsValidation($user, $validationSetting, $value, $fieldName)
     {
-        if (method_exists($user, 'get' . ucfirst($validationSetting))) {
+        if ($user && method_exists($user, 'get' . ucfirst($validationSetting))) {
             $valueToCompare = $user->{'get' . ucfirst($validationSetting)}();
             if (!$this->validateSameAs($value, $valueToCompare)) {
                 $this->addError('validationErrorSameAs', 0, ['field' => $fieldName]);
@@ -334,7 +334,7 @@ class ServersideValidator extends AbstractValidator
                     return true;
                 }
 
-                if (method_exists($current, 'getUid')) {
+                if ($current && method_exists($current, 'getUid')) {
                     $value = $current->getUid();
                 }
             }
